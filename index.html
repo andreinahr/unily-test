@@ -1,17 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
 </head>
 <body>
-    <div>
+  <div>
     <video controls style="padding: 10px; width: 100%; border-radius: 6px; border: 1px solid #ccc;">
-        <source src="https://scummbar.com/mi2/MI1-CD/03%20-%20The%20Scumm%20Bar.mp3" type="audio/mp3">
+      <source src="https://scummbar.com/mi2/MI1-CD/03%20-%20The%20Scumm%20Bar.mp3" type="audio/mp3">
     </video>
 
     <input type="text" id="testInput" placeholder="Test..." style="padding: 10px; width: 100%; border-radius: 6px; border: 1px solid #ccc; font-size: 16px;" />
-</div>
+  </div>
+
+  <script>
+    // Fix Safari bug: prevent space from toggling video when typing in inputs
+    document.querySelectorAll("input, textarea").forEach(el => {
+      el.addEventListener("keydown", function (e) {
+        if (e.code === "Space") {
+          e.stopPropagation(); // allow space in input, block Safari video toggle
+        }
+      });
+    });
+  </script>
 </body>
 </html>
