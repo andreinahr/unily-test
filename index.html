@@ -7,19 +7,30 @@
 </head>
 <body>
   <div>
-    <audio controls style="padding: 10px; width: 100%; border-radius: 6px; border: 1px solid #ccc;">
+    <video id="audioPlayer" 
+           controls 
+           poster="https://placehold.co/600x400/png"
+           style="padding: 10px; width: 100%; border-radius: 6px; border: 1px solid #ccc;">
       <source src="https://scummbar.com/mi2/MI1-CD/03%20-%20The%20Scumm%20Bar.mp3" type="audio/mp3">
-    </audio>
-
-    <input type="text" id="testInput" placeholder="Test..." style="padding: 10px; width: 100%; border-radius: 6px; border: 1px solid #ccc; font-size: 16px;" />
+      Your browser does not support the video player.
+    </video>
   </div>
 
   <script>
-    // Fix Safari bug: prevent space from toggling video when typing in inputs
-    document.querySelectorAll("input, textarea").forEach(el => {
-      el.addEventListener("keydown", function (e) {
-        if (e.code === "Space") {
-          e.stopPropagation(); // allow space in input, block Safari video toggle
+    document.addEventListener('DOMContentLoaded', function() {
+      const video = document.getElementById('audioPlayer');
+      
+      video.addEventListener('play', async function() {
+        try {
+          if (video.requestFullscreen) {
+            await video.requestFullscreen();
+          } else if (video.webkitRequestFullscreen) { // Safari
+            await video.webkitRequestFullscreen();
+          } else if (video.msRequestFullscreen) { // IE11
+            await video.msRequestFullscreen();
+          }
+        } catch (error) {
+          console.log('Fullscreen request failed:', error);
         }
       });
     });
