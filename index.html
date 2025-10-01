@@ -20,14 +20,16 @@
     document.addEventListener('DOMContentLoaded', function() {
       const video = document.getElementById('audioPlayer');
       
-      video.addEventListener('play', async function() {
+      video.addEventListener('play', function() {
         try {
-          if (video.requestFullscreen) {
-            await video.requestFullscreen();
-          } else if (video.webkitRequestFullscreen) { // Safari
-            await video.webkitRequestFullscreen();
-          } else if (video.msRequestFullscreen) { // IE11
-            await video.msRequestFullscreen();
+          if (video.webkitEnterFullscreen) {
+            video.webkitEnterFullscreen(); // iOS Safari specific
+          } else if (video.requestFullscreen) {
+            video.requestFullscreen();
+          } else if (video.webkitRequestFullscreen) {
+            video.webkitRequestFullscreen();
+          } else if (video.msRequestFullscreen) {
+            video.msRequestFullscreen();
           }
         } catch (error) {
           console.log('Fullscreen request failed:', error);
