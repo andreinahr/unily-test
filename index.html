@@ -7,35 +7,9 @@
 </head>
 <body>
   <div>
-    <video id="audioPlayer" 
-           controls 
-           poster="https://placehold.co/600x400/png"
-           style="padding: 10px; width: 100%; border-radius: 6px; border: 1px solid #ccc;">
+    <video controls>
       <source src="https://scummbar.com/mi2/MI1-CD/03%20-%20The%20Scumm%20Bar.mp3" type="audio/mp3">
-      Your browser does not support the video player.
     </video>
   </div>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const video = document.getElementById('audioPlayer');
-      
-      video.addEventListener('play', function() {
-        try {
-          if (video.webkitEnterFullscreen) {
-            video.webkitEnterFullscreen(); // iOS Safari specific
-          } else if (video.requestFullscreen) {
-            video.requestFullscreen();
-          } else if (video.webkitRequestFullscreen) {
-            video.webkitRequestFullscreen();
-          } else if (video.msRequestFullscreen) {
-            video.msRequestFullscreen();
-          }
-        } catch (error) {
-          console.log('Fullscreen request failed:', error);
-        }
-      });
-    });
-  </script>
 </body>
 </html>
