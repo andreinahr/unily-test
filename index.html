@@ -1,15 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <meta charset="UTF-8" />
+  <title>Bitmovin iOS Fullscreen Fix Test</title>
+  <script src="https://cdn.bitmovin.com/player/web/8/bitmovinplayer.js"></script>
+  <style>
+    body { font-family: sans-serif; padding: 20px; background: #fafafa; }
+    #player { width: 100%; max-width: 640px; aspect-ratio: 16/9; margin: 0 auto; background: #000; }
+    button { margin: 10px; padding: 10px 15px; }
+  </style>
 </head>
 <body>
-  <div>
-    <video controls>
-      <source src="https://scummbar.com/mi2/MI1-CD/03%20-%20The%20Scumm%20Bar.mp3" type="audio/mp3">
-    </video>
+  <h2>Bitmovin iOS Fullscreen Fix Test</h2>
+  <div id="player"></div>
+  <div style="text-align:center">
+    <button id="loadAudio">Load Audio</button>
+    <button id="loadVideo">Load Video</button>
   </div>
+
+  <script>
+    // Replace with your own Bitmovin key
+    const playerConfig = {
+      key: 'ec217a70-d15c-42db-bdfb-70d3d2725063',
+      playback: { autoplay: false },
+    };
+
+    const playerContainer = document.getElementById('player');
+    const player = new bitmovin.player.Player(playerContainer, playerConfig);
+
+    // Replace with real test sources
+    const audioSource = {
+      hls: 'https://cdn.bitmovin.com/content/assets/hls/manifest-audio-only.m3u8'
+    };
+
+    const videoSource = {
+      hls: 'https://cdn.bitmovin.com/content/assets/hls/manifest.m3u8'
+    };
+
+    function isIOS() {
+      return /iPad|iPhone|iPod/.test(navigator.userAgent);
+    }
+
+    // --- FIX FUNCTION ---
+    function resetMediaElementForIOS() {
+      if (!isIOS()) return;
+
+      const mediaEl = playerContainer.querySelector('video, audio');
+      if (mediaEl) {
+        console.log('[iOS Fix] Resetting media element to restore fullscreen support...');
+        const newEl = mediaEl.cloneNode(false);
+        mediaEl.remove();
+        playerContainer.appendChild(newEl);
+      }
+    }
+
+    async function loadSource(source, type) {
+      console.log(`Loading ${type} source...`);
+      await player.unload();
+      if (isIOS() && type === 'video') resetMediaElementForIOS();
+      await player.load(source);
+    }
+
+    document.getElementById('loadAudio').addEventListener('click', () => loadSource(audioSource, 'audio'));
+    document.getElementById('loadVideo').addEventListener('click', () => loadSource(videoSource, 'video'));
+  </script>
 </body>
 </html>
