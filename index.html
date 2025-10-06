@@ -66,14 +66,22 @@
 
     // === Load sources ===
     async function loadSource(source, type) {
-      await player.unload();
-      await player.load(source);
+      try {
+        await player.unload();
+        await player.load(source);
+      } catch (error) {
+        console.error(`Error loading ${type}:`, error);
+        alert(`Failed to load ${type}: ${error.message}`);
+      }
     }
 
     // === Button handlers ===
-    document.getElementById('loadAudio').addEventListener('click', () => loadSource(audioSource, 'audio'));
-    document.getElementById('loadVideo').addEventListener('click', () => loadSource(videoSource, 'video'));
+    document.getElementById('loadAudio').addEventListener('click', async () => {
+      await loadSource(audioSource, 'audio');
+    });
+    document.getElementById('loadVideo').addEventListener('click', async () => {
+      await loadSource(videoSource, 'video');
+    });
   </script>
 </body>
 </html>
-
