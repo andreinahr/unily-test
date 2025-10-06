@@ -39,6 +39,7 @@
   <div>
     <button id="loadAudio">Load Audio</button>
     <button id="loadVideo">Load Video</button>
+    <button id="loadTest">Load Test Video (Public)</button>
   </div>
 
   <script>
@@ -50,6 +51,23 @@
 
     const playerContainer = document.getElementById('player');
     const player = new bitmovin.player.Player(playerContainer, playerConfig);
+
+    // Add event listeners for debugging
+    player.on('ready', () => {
+      console.log('Player is ready');
+    });
+
+    player.on('error', (event) => {
+      console.error('Player error:', event);
+    });
+
+    player.on('sourceloaded', () => {
+      console.log('Source loaded successfully');
+    });
+
+    player.on('sourceerror', (event) => {
+      console.error('Source error:', event);
+    });
 
     // === Audio source ===
     const audioSource = {
@@ -64,14 +82,41 @@
       poster: 'https://cdn.bitmovin.com/content/assets/art-of-motion-dash-hls-progressive/poster.jpg'
     };
 
+    // === Test source (public, no auth required) ===
+    const testSource = {
+      progressive: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
+    };
+
     // === Load sources ===
     async function loadSource(source, type) {
       try {
+        console.log(`Starting to load ${type} source:`, source);
+        
+        // Wait for player to be ready
+        await new Promise((resolve) => {
+          if (player.isReady()) {
+            resolve();
+          } else {
+            player.on('ready', resolve);
+          }
+        });
+        
+        console.log('Player is ready, unloading previous source...');
         await player.unload();
+        
+        console.log('Loading new source...');
         await player.load(source);
+        
+        console.log(`${type} source loaded successfully!`);
       } catch (error) {
         console.error(`Error loading ${type}:`, error);
-        alert(`Failed to load ${type}: ${error.message}`);
+        console.error('Error details:', {
+          name: error.name,
+          message: error.message,
+          code: error.code,
+          data: error.data
+        });
+        alert(`Failed to load ${type}: ${error.message || error.code || 'Unknown error'}`);
       }
     }
 
@@ -81,6 +126,9 @@
     });
     document.getElementById('loadVideo').addEventListener('click', async () => {
       await loadSource(videoSource, 'video');
+    });
+    document.getElementById('loadTest').addEventListener('click', async () => {
+      await loadSource(testSource, 'test video');
     });
   </script>
 </body>
