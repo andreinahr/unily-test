@@ -5,62 +5,93 @@
   <title>Bitmovin iOS Fullscreen Fix Test</title>
   <script src="https://cdn.bitmovin.com/player/web/8/bitmovinplayer.js"></script>
   <style>
-    body { font-family: sans-serif; padding: 20px; background: #fafafa; }
-    #player { width: 100%; max-width: 640px; aspect-ratio: 16/9; margin: 0 auto; background: #000; }
-    button { margin: 10px; padding: 10px 15px; }
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      background: #fafafa;
+      text-align: center;
+    }
+    #player {
+      width: 100%;
+      max-width: 640px;
+      aspect-ratio: 16/9;
+      margin: 20px auto;
+      background: #000;
+    }
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 14px;
+      cursor: pointer;
+      border-radius: 6px;
+      border: none;
+      background-color: #007bff;
+      color: white;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
   </style>
 </head>
 <body>
   <h2>Bitmovin iOS Fullscreen Fix Test</h2>
   <div id="player"></div>
-  <div style="text-align:center">
+  <div>
     <button id="loadAudio">Load Audio</button>
     <button id="loadVideo">Load Video</button>
   </div>
 
   <script>
-    // Replace with your own Bitmovin key
+    // === Bitmovin player configuration ===
     const playerConfig = {
       key: 'ec217a70-d15c-42db-bdfb-70d3d2725063',
       playback: { autoplay: false },
     };
 
-  const playerContainer = document.getElementById('player');
-  const player = new bitmovin.player.Player(playerContainer, playerConfig);
+    const playerContainer = document.getElementById('player');
+    const player = new bitmovin.player.Player(playerContainer, playerConfig);
 
-  // ✅ Public Bitmovin demo sources
-  const audioSource = {
-    hls: 'https://cdn.bitmovin.com/content/audio/stream-audio-only.m3u8'
-  };
+    // === Audio source ===
+    const audioSource = {
+      hls: 'https://cdn.bitmovin.com/content/assets/blender-4k/38e843e0-1998-11e9-8a92-c734cd79b4dc/manifest.m3u8'
+    };
 
-  const videoSource = {
-    hls: 'https://cdn.bitmovin.com/content/assets/hls/playlist.m3u8'
-  };
+    // === Video source ===
+    const videoSource = {
+      dash: 'https://cdn.bitmovin.com/content/assets/art-of-motion-dash-hls-progressive/mpds/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.mpd',
+      hls: 'https://cdn.bitmovin.com/content/assets/art-of-motion-dash-hls-progressive/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8',
+      progressive: 'https://cdn.bitmovin.com/content/assets/art-of-motion-dash-hls-progressive/MI201109210084_mpeg-4_hd_high_1080p25_10mbits.mp4',
+      poster: 'https://cdn.bitmovin.com/content/assets/art-of-motion-dash-hls-progressive/poster.jpg'
+    };
 
-  function isIOS() {
-    return /iPad|iPhone|iPod/.test(navigator.userAgent);
-  }
-
-  function resetMediaElementForIOS() {
-    if (!isIOS()) return;
-    const mediaEl = playerContainer.querySelector('video, audio');
-    if (mediaEl) {
-      console.log('[iOS Fix] Resetting media element to restore fullscreen support...');
-      const newEl = mediaEl.cloneNode(false);
-      mediaEl.remove();
-      playerContainer.appendChild(newEl);
+    // === Helpers ===
+    function isIOS() {
+      return /iPad|iPhone|iPod/.test(navigator.userAgent);
     }
-  }
 
-  async function loadSource(source, type) {
-    console.log(`Loading ${type} source...`);
-    await player.unload();
-    if (isIOS() && type === 'video') resetMediaElementForIOS();
-    await player.load(source);
-  }
+    function resetMediaElementForIOS() {
+      if (!isIOS()) return;
+      const mediaEl = playerContainer.querySelector('video, audio');
+      if (mediaEl) {
+        console.log('[iOS Fix] Resetting media element to restore fullscreen support...');
+        const newEl = mediaEl.cloneNode(false);
+        mediaEl.remove();
+        playerContainer.appendChild(newEl);
+      }
+    }
 
-  document.getElementById('loadAudio').addEventListener('click', () => loadSource(audioSource, 'audio'));
-  document.getElementById('loadVideo').addEventListener('click', () => loadSource(videoSource, 'video'));
-</script>
+    // === Load sources ===
+    async function loadSource(source, type) {
+      console.log(`Loading ${type} source...`);
+      await player.unload();
+      if (isIOS() && type === 'video') resetMediaElementForIOS();
+      await player.load(source);
+    }
+
+    // === Button handlers ===
+    document.getElementById('loadAudio').addEventListener('click', () => loadSource(audioSource, 'audio'));
+    document.getElementById('loadVideo').addEventListener('click', () => loadSource(videoSource, 'video'));
+  </script>
 </body>
 </html>
+
