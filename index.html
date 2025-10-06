@@ -111,23 +111,7 @@
     }
 
     // === Button handlers ===
-    document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('loadAudio').addEventListener('click', async () => {
-        if (!player) {
-          alert('Player not initialized yet');
-          return;
-        }
-        await loadSource(audioSource, 'audio');
-      });
-      
-      document.getElementById('loadVideo').addEventListener('click', async () => {
-        if (!player) {
-          alert('Player not initialized yet');
-          return;
-        }
-        await loadSource(videoSource, 'video');
-      });
-      
+    document.addEventListener('DOMContentLoaded', () => {      
       document.getElementById('loadTest').addEventListener('click', async () => {
         if (!player) {
           alert('Player not initialized yet');
