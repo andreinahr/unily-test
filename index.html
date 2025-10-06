@@ -25,44 +25,42 @@
       playback: { autoplay: false },
     };
 
-    const playerContainer = document.getElementById('player');
-    const player = new bitmovin.player.Player(playerContainer, playerConfig);
+  const playerContainer = document.getElementById('player');
+  const player = new bitmovin.player.Player(playerContainer, playerConfig);
 
-    // Replace with real test sources
-    const audioSource = {
-      hls: 'https://cdn.bitmovin.com/content/assets/hls/manifest-audio-only.m3u8'
-    };
+  // ✅ Public Bitmovin demo sources
+  const audioSource = {
+    hls: 'https://cdn.bitmovin.com/content/audio/stream-audio-only.m3u8'
+  };
 
-    const videoSource = {
-      hls: 'https://cdn.bitmovin.com/content/assets/hls/manifest.m3u8'
-    };
+  const videoSource = {
+    hls: 'https://cdn.bitmovin.com/content/assets/hls/playlist.m3u8'
+  };
 
-    function isIOS() {
-      return /iPad|iPhone|iPod/.test(navigator.userAgent);
+  function isIOS() {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent);
+  }
+
+  function resetMediaElementForIOS() {
+    if (!isIOS()) return;
+    const mediaEl = playerContainer.querySelector('video, audio');
+    if (mediaEl) {
+      console.log('[iOS Fix] Resetting media element to restore fullscreen support...');
+      const newEl = mediaEl.cloneNode(false);
+      mediaEl.remove();
+      playerContainer.appendChild(newEl);
     }
+  }
 
-    // --- FIX FUNCTION ---
-    function resetMediaElementForIOS() {
-      if (!isIOS()) return;
+  async function loadSource(source, type) {
+    console.log(`Loading ${type} source...`);
+    await player.unload();
+    if (isIOS() && type === 'video') resetMediaElementForIOS();
+    await player.load(source);
+  }
 
-      const mediaEl = playerContainer.querySelector('video, audio');
-      if (mediaEl) {
-        console.log('[iOS Fix] Resetting media element to restore fullscreen support...');
-        const newEl = mediaEl.cloneNode(false);
-        mediaEl.remove();
-        playerContainer.appendChild(newEl);
-      }
-    }
-
-    async function loadSource(source, type) {
-      console.log(`Loading ${type} source...`);
-      await player.unload();
-      if (isIOS() && type === 'video') resetMediaElementForIOS();
-      await player.load(source);
-    }
-
-    document.getElementById('loadAudio').addEventListener('click', () => loadSource(audioSource, 'audio'));
-    document.getElementById('loadVideo').addEventListener('click', () => loadSource(videoSource, 'video'));
-  </script>
+  document.getElementById('loadAudio').addEventListener('click', () => loadSource(audioSource, 'audio'));
+  document.getElementById('loadVideo').addEventListener('click', () => loadSource(videoSource, 'video'));
+</script>
 </body>
 </html>
