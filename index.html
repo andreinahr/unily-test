@@ -43,30 +43,39 @@
   </div>
 
   <script>
-    // === Bitmovin player configuration ===
-    const playerConfig = {
-      key: 'ec217a70-d15c-42db-bdfb-70d3d2725063',
-      playback: { autoplay: false },
-    };
+    let player;
 
-    const playerContainer = document.getElementById('player');
-    const player = new bitmovin.player.Player(playerContainer, playerConfig);
+    // Initialize player when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('DOM loaded, initializing player...');
+      
+      // === Bitmovin player configuration ===
+      const playerConfig = {
+        key: 'ec217a70-d15c-42db-bdfb-70d3d2725063',
+        playback: { autoplay: false },
+      };
 
-    // Add event listeners for debugging
-    player.on('ready', () => {
-      console.log('Player is ready');
-    });
+      const playerContainer = document.getElementById('player');
+      player = new bitmovin.player.Player(playerContainer, playerConfig);
 
-    player.on('error', (event) => {
-      console.error('Player error:', event);
-    });
+      // Add event listeners for debugging
+      player.on('ready', () => {
+        console.log('Player is ready');
+      });
 
-    player.on('sourceloaded', () => {
-      console.log('Source loaded successfully');
-    });
+      player.on('error', (event) => {
+        console.error('Player error:', event);
+      });
 
-    player.on('sourceerror', (event) => {
-      console.error('Source error:', event);
+      player.on('sourceloaded', () => {
+        console.log('Source loaded successfully');
+      });
+
+      player.on('sourceerror', (event) => {
+        console.error('Source error:', event);
+      });
+
+      console.log('Player initialized');
     });
 
     // === Audio source ===
@@ -92,16 +101,7 @@
       try {
         console.log(`Starting to load ${type} source:`, source);
         
-        // Wait for player to be ready
-        await new Promise((resolve) => {
-          if (player.isReady()) {
-            resolve();
-          } else {
-            player.on('ready', resolve);
-          }
-        });
-        
-        console.log('Player is ready, unloading previous source...');
+        console.log('Unloading previous source...');
         await player.unload();
         
         console.log('Loading new source...');
@@ -121,14 +121,30 @@
     }
 
     // === Button handlers ===
-    document.getElementById('loadAudio').addEventListener('click', async () => {
-      await loadSource(audioSource, 'audio');
-    });
-    document.getElementById('loadVideo').addEventListener('click', async () => {
-      await loadSource(videoSource, 'video');
-    });
-    document.getElementById('loadTest').addEventListener('click', async () => {
-      await loadSource(testSource, 'test video');
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('loadAudio').addEventListener('click', async () => {
+        if (!player) {
+          alert('Player not initialized yet');
+          return;
+        }
+        await loadSource(audioSource, 'audio');
+      });
+      
+      document.getElementById('loadVideo').addEventListener('click', async () => {
+        if (!player) {
+          alert('Player not initialized yet');
+          return;
+        }
+        await loadSource(videoSource, 'video');
+      });
+      
+      document.getElementById('loadTest').addEventListener('click', async () => {
+        if (!player) {
+          alert('Player not initialized yet');
+          return;
+        }
+        await loadSource(testSource, 'test video');
+      });
     });
   </script>
 </body>
