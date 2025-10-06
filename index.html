@@ -36,10 +36,8 @@
 <body>
   <h2>Bitmovin iOS Fullscreen Fix Test</h2>
   <div id="player"></div>
-  <div>
-    <button id="loadAudio">Load Audio</button>
-    <button id="loadVideo">Load Video</button>
     <button id="loadTest">Load Test Video (Public)</button>
+    <button id="loadTestAudio">Load Test Audio (Public MP3)</button>
   </div>
 
   <script>
@@ -78,22 +76,14 @@
       console.log('Player initialized');
     });
 
-    // === Audio source ===
-    const audioSource = {
-      hls: 'https://cdn.bitmovin.com/content/assets/art-of-motion-dash-hls-progressive/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa-audio-only.m3u8'
-    };
-
-    // === Video source ===
-    const videoSource = {
-      dash: 'https://cdn.bitmovin.com/content/assets/art-of-motion-dash-hls-progressive/mpds/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.mpd',
-      hls: 'https://cdn.bitmovin.com/content/assets/art-of-motion-dash-hls-progressive/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8',
-      progressive: 'https://cdn.bitmovin.com/content/assets/art-of-motion-dash-hls-progressive/MI201109210084_mpeg-4_hd_high_1080p25_10mbits.mp4',
-      poster: 'https://cdn.bitmovin.com/content/assets/art-of-motion-dash-hls-progressive/poster.jpg'
-    };
-
     // === Test source (public, no auth required) ===
     const testSource = {
       progressive: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
+    };
+
+    // === Test audio source (public MP3) ===
+    const testAudioSource = {
+      progressive: 'https://archive.org/download/testmp3testfile/mpthreetest.mp3'
     };
 
     // === Load sources ===
@@ -144,6 +134,14 @@
           return;
         }
         await loadSource(testSource, 'test video');
+      });
+      
+      document.getElementById('loadTestAudio').addEventListener('click', async () => {
+        if (!player) {
+          alert('Player not initialized yet');
+          return;
+        }
+        await loadSource(testAudioSource, 'test audio');
       });
     });
   </script>
