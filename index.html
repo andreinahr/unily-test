@@ -64,27 +64,9 @@
       poster: 'https://cdn.bitmovin.com/content/assets/art-of-motion-dash-hls-progressive/poster.jpg'
     };
 
-    // === Helpers ===
-    function isIOS() {
-      return /iPad|iPhone|iPod/.test(navigator.userAgent);
-    }
-
-    function resetMediaElementForIOS() {
-      if (!isIOS()) return;
-      const mediaEl = playerContainer.querySelector('video, audio');
-      if (mediaEl) {
-        console.log('[iOS Fix] Resetting media element to restore fullscreen support...');
-        const newEl = mediaEl.cloneNode(false);
-        mediaEl.remove();
-        playerContainer.appendChild(newEl);
-      }
-    }
-
     // === Load sources ===
     async function loadSource(source, type) {
-      console.log(`Loading ${type} source...`);
       await player.unload();
-      if (isIOS() && type === 'video') resetMediaElementForIOS();
       await player.load(source);
     }
 
