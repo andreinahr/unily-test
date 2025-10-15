@@ -112,7 +112,17 @@
 
 		// === Test source (public, no auth required) ===
 		const testSource = {
-			hls: 'https://cdn.bitmovin.com/content/assets/art-of-motion-dash-hls-progressive/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8'
+			hls: 'https://cdn.bitmovin.com/content/assets/art-of-motion-dash-hls-progressive/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8',
+			// Try adding subtitles in source config first
+			subtitleTracks: [
+				{
+					url: 'https://bitdash-a.akamaihd.net/content/sintel/subtitles/subtitles_en.vtt',
+					label: 'English',
+					id: 'en_sub',
+					language: 'en',
+					isDefault: false
+				}
+			]
 		};
 
 		// === Test audio source (public MP3) ===
@@ -170,40 +180,53 @@
 				try {
 					console.log('Manual subtitle addition attempt...');
 					
-					// Try multiple subtitle URLs and methods
-					const subtitleUrls = [
-						'https://bitdash-a.akamaihd.net/content/sintel/subtitles/subtitles_en.vtt',
-						'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/subtitles_en.vtt',
-						'https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel-en.webvtt'
-					];
-
-					for (let i = 0; i < subtitleUrls.length; i++) {
-						try {
-							const subtitleTrack = {
-								url: subtitleUrls[i],
-								label: `English ${i + 1}`,
-								id: `en_sub_${i}`,
-								language: 'en'
-							};
+					// First try the sourceApi approach (recommended by Bitmovin)
+					try {
+						console.log('Trying sourceApi approach...');
+						const sources = player.sources && player.sources.list;
+						if (sources && sources.length > 0) {
+							const sourceApi = sources[0];
+							console.log('Found sourceApi:', sourceApi);
 							
-							console.log(`Trying subtitle URL ${i + 1}:`, subtitleUrls[i]);
-							
-							if (player.subtitles && typeof player.subtitles.add === 'function') {
-								await player.subtitles.add(subtitleTrack);
-								console.log(`Successfully added subtitle ${i + 1}`);
-								break;
-							} else {
-								console.log('player.subtitles.add is not a function');
+							if (sourceApi.subtitles && sourceApi.subtitles.add) {
+								const subtitleTrack = await sourceApi.subtitles.add({
+									language: 'en',
+									label: 'Manual English (sourceApi)',
+									url: 'https://bitdash-a.akamaihd.net/content/sintel/subtitles/subtitles_en.vtt'
+								});
+								console.log('Subtitle added via sourceApi:', subtitleTrack);
+								
+								// Try to activate it
+								if (sourceApi.subtitles.activate) {
+									sourceApi.subtitles.activate(subtitleTrack);
+									console.log('Subtitle activated via sourceApi');
+								}
+								
+								alert('Subtitles added successfully via sourceApi!');
+								return;
 							}
-						} catch (error) {
-							console.error(`Failed to add subtitle ${i + 1}:`, error);
 						}
+					} catch (sourceApiError) {
+						console.log('sourceApi approach failed:', sourceApiError);
 					}
 					
-					// Check results
-					const subtitles = player.subtitles.list();
-					console.log('Subtitles after manual addition:', subtitles);
-					alert(`Manual addition result: ${subtitles.length} subtitles available`);
+					// Fallback to old method if sourceApi doesn't work
+					console.log('Trying fallback player.subtitles approach...');
+					if (player.subtitles && typeof player.subtitles.add === 'function') {
+						const subtitleTrack = {
+							url: 'https://bitdash-a.akamaihd.net/content/sintel/subtitles/subtitles_en.vtt',
+							label: 'Manual English (fallback)',
+							id: 'en_sub_manual',
+							language: 'en'
+						};
+						
+						await player.subtitles.add(subtitleTrack);
+						console.log('Subtitle added via fallback method');
+						alert('Subtitles added via fallback method!');
+					} else {
+						console.log('No subtitle addition method available');
+						alert('No subtitle addition method available');
+					}
 					
 				} catch (error) {
 					console.error('Manual subtitle addition failed:', error);
