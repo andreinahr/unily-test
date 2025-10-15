@@ -41,6 +41,8 @@
 		<button id="loadTestAudio">Load Test Audio (Public MP3)</button>
 		<button id="addSubtitlesManually">Add Subtitles Manually</button>
 		<button id="checkSubtitles">Check Available Subtitles</button>
+		<button id="enableSubtitles">Enable First Subtitle</button>
+		<button id="disableSubtitles">Disable Subtitles</button>
 	</div>
 
 	<script>
@@ -70,37 +72,19 @@
 
 			player.on('sourceloaded', () => {
 				console.log('Source loaded successfully');
-				// Try to add subtitles programmatically after source loads
-				setTimeout(async () => {
-					try {
-						console.log('Attempting to add subtitles...');
-						const subtitleTrack = {
-							url: 'https://bitdash-a.akamaihd.net/content/sintel/subtitles/subtitles_en.vtt',
-							label: 'English',
-							id: 'en_sub',
-							language: 'en'
-						};
-						
-						// Try different methods to add subtitles
-						if (player.subtitles && player.subtitles.add) {
-							await player.subtitles.add(subtitleTrack);
-							console.log('Subtitle added via add() method');
-						} else {
-							console.log('subtitles.add method not available');
-						}
-						
-						// Check what subtitles are available
-						const subtitles = player.subtitles.list();
-						console.log('Available subtitles after adding:', subtitles);
-						if (subtitles.length > 0) {
-							console.log('Subtitles loaded successfully!');
-						} else {
-							console.log('No subtitles available');
-						}
-					} catch (error) {
-						console.error('Error adding subtitles:', error);
+				
+				// Check subtitles after source loads
+				setTimeout(() => {
+					const subtitles = player.subtitles.list();
+					console.log('Available subtitles after source load:', subtitles);
+					if (subtitles.length > 0) {
+						console.log('Subtitles loaded successfully:', subtitles.map(s => s.label));
+						// Optionally enable the first subtitle
+						// player.subtitles.enable(subtitles[0].id);
+					} else {
+						console.log('No subtitles available from source');
 					}
-				}, 500);
+				}, 1000);
 			});
 
 			player.on('sourceerror', (event) => {
@@ -113,14 +97,21 @@
 		// === Test source (public, no auth required) ===
 		const testSource = {
 			hls: 'https://cdn.bitmovin.com/content/assets/art-of-motion-dash-hls-progressive/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8',
-			// Try adding subtitles in source config first
-			subtitleTracks: [
+			// Add subtitles properly in source config
+			subtitles: [
 				{
 					url: 'https://bitdash-a.akamaihd.net/content/sintel/subtitles/subtitles_en.vtt',
 					label: 'English',
 					id: 'en_sub',
-					language: 'en',
-					isDefault: false
+					lang: 'en',
+					kind: 'subtitles'
+				},
+				{
+					url: 'https://bitdash-a.akamaihd.net/content/sintel/subtitles/subtitles_de.vtt',
+					label: 'German',
+					id: 'de_sub', 
+					lang: 'de',
+					kind: 'subtitles'
 				}
 			]
 		};
@@ -177,60 +168,44 @@
 					alert('Player not initialized yet');
 					return;
 				}
+				
 				try {
 					console.log('Manual subtitle addition attempt...');
 					
-					// First try the sourceApi approach (recommended by Bitmovin)
-					try {
-						console.log('Trying sourceApi approach...');
-						const sources = player.sources && player.sources.list;
-						if (sources && sources.length > 0) {
-							const sourceApi = sources[0];
-							console.log('Found sourceApi:', sourceApi);
-							
-							if (sourceApi.subtitles && sourceApi.subtitles.add) {
-								const subtitleTrack = await sourceApi.subtitles.add({
-									language: 'en',
-									label: 'Manual English (sourceApi)',
-									url: 'https://bitdash-a.akamaihd.net/content/sintel/subtitles/subtitles_en.vtt'
-								});
-								console.log('Subtitle added via sourceApi:', subtitleTrack);
-								
-								// Try to activate it
-								if (sourceApi.subtitles.activate) {
-									sourceApi.subtitles.activate(subtitleTrack);
-									console.log('Subtitle activated via sourceApi');
-								}
-								
-								alert('Subtitles added successfully via sourceApi!');
-								return;
-							}
-						}
-					} catch (sourceApiError) {
-						console.log('sourceApi approach failed:', sourceApiError);
-					}
+					// Use the correct Bitmovin API for adding subtitles
+					const subtitleConfig = {
+						url: 'https://bitdash-a.akamaihd.net/content/sintel/subtitles/subtitles_fr.vtt',
+						label: 'French (Manual)',
+						id: 'fr_manual',
+						lang: 'fr',
+						kind: 'subtitles'
+					};
 					
-					// Fallback to old method if sourceApi doesn't work
-					console.log('Trying fallback player.subtitles approach...');
-					if (player.subtitles && typeof player.subtitles.add === 'function') {
-						const subtitleTrack = {
-							url: 'https://bitdash-a.akamaihd.net/content/sintel/subtitles/subtitles_en.vtt',
-							label: 'Manual English (fallback)',
-							id: 'en_sub_manual',
-							language: 'en'
+					// Check if we can add subtitles to the current source
+					const currentSource = player.getSource();
+					if (currentSource) {
+						console.log('Current source:', currentSource);
+						
+						// Method 1: Try adding to the source and reload
+						const newSource = {
+							...currentSource,
+							subtitles: [
+								...(currentSource.subtitles || []),
+								subtitleConfig
+							]
 						};
 						
-						await player.subtitles.add(subtitleTrack);
-						console.log('Subtitle added via fallback method');
-						alert('Subtitles added via fallback method!');
+						console.log('Reloading with new subtitle...');
+						await player.load(newSource);
+						
+						alert('Subtitle added successfully! Check the subtitles menu.');
 					} else {
-						console.log('No subtitle addition method available');
-						alert('No subtitle addition method available');
+						alert('No source loaded. Please load a video first.');
 					}
 					
 				} catch (error) {
 					console.error('Manual subtitle addition failed:', error);
-					alert('Manual subtitle addition failed: ' + error.message);
+					alert('Failed to add subtitle: ' + error.message);
 				}
 			});
 
@@ -241,7 +216,54 @@
 				}
 				const subtitles = player.subtitles.list();
 				console.log('Available subtitles:', subtitles);
-				alert(`Available subtitles: ${subtitles.length > 0 ? subtitles.map(s => s.label).join(', ') : 'None'}`);
+				
+				let message = `Available subtitles: ${subtitles.length}\n`;
+				if (subtitles.length > 0) {
+					subtitles.forEach((sub, index) => {
+						message += `${index + 1}. ${sub.label} (${sub.lang || sub.language}) - ID: ${sub.id}\n`;
+					});
+				} else {
+					message += 'None found. Make sure to load a video with subtitles first.';
+				}
+				
+				alert(message);
+			});
+
+			document.getElementById('enableSubtitles').addEventListener('click', () => {
+				if (!player) {
+					alert('Player not initialized yet');
+					return;
+				}
+				
+				const subtitles = player.subtitles.list();
+				if (subtitles.length > 0) {
+					try {
+						player.subtitles.enable(subtitles[0].id);
+						console.log('Enabled subtitle:', subtitles[0].label);
+						alert(`Enabled subtitle: ${subtitles[0].label}`);
+					} catch (error) {
+						console.error('Error enabling subtitle:', error);
+						alert('Error enabling subtitle: ' + error.message);
+					}
+				} else {
+					alert('No subtitles available to enable');
+				}
+			});
+
+			document.getElementById('disableSubtitles').addEventListener('click', () => {
+				if (!player) {
+					alert('Player not initialized yet');
+					return;
+				}
+				
+				try {
+					player.subtitles.disable();
+					console.log('Subtitles disabled');
+					alert('Subtitles disabled');
+				} catch (error) {
+					console.error('Error disabling subtitles:', error);
+					alert('Error disabling subtitles: ' + error.message);
+				}
 			});
 		});
 	</script>
