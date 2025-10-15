@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Bitmovin Player with Subtitles</title>
+  <title>Bitmovin Player - Fullscreen, Subtitles Off</title>
 
   <!-- Bitmovin Player library -->
   <script src="https://cdn.bitmovin.com/player/web/8/bitmovinplayer.js"></script>
@@ -41,14 +41,28 @@
           id: 'en',
           kind: 'subtitles',
           lang: 'en',
-          enabled: true
+          enabled: false // 👈 Subtitles OFF by default
         }
       ]
     };
 
     const player = new bitmovin.player.Player(document.getElementById('player'), config);
+
     player.load(source).then(() => {
       console.log('Video successfully loaded!');
+
+      // Request fullscreen automatically
+      const playerContainer = document.getElementById('player');
+      if (playerContainer.requestFullscreen) {
+        playerContainer.requestFullscreen();
+      } else if (playerContainer.webkitRequestFullscreen) { // Safari
+        playerContainer.webkitRequestFullscreen();
+      } else if (playerContainer.msRequestFullscreen) { // IE/Edge
+        playerContainer.msRequestFullscreen();
+      }
+
+      // Ensure subtitles are off on load
+      player.subtitles.setSubtitleTrack(null);
     }).catch(error => {
       console.error('Error loading video:', error);
     });
