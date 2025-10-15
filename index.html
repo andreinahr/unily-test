@@ -36,8 +36,12 @@
 <body>
 	<h2>Bitmovin iOS Fullscreen Fix Test</h2>
 	<div id="player"></div>
+	<div>
 		<button id="loadTest">Load Test Video (Public)</button>
 		<button id="loadTestAudio">Load Test Audio (Public MP3)</button>
+		<button id="checkSubtitles">Check Available Subtitles</button>
+		<button id="enableSubtitles">Enable Subtitles</button>
+		<button id="disableSubtitles">Disable Subtitles</button>
 	</div>
 
 	<script>
@@ -78,7 +82,17 @@
 
 		// === Test source (public, no auth required) ===
 		const testSource = {
-			hls: 'https://cdn.bitmovin.com/content/assets/art-of-motion-dash-hls-progressive/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8'
+			hls: 'https://cdn.bitmovin.com/content/assets/art-of-motion-dash-hls-progressive/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8',
+			// Add subtitles directly to the source configuration
+			subtitleTracks: [
+				{
+					url: 'https://storage.googleapis.com/bitmovin-api-europe-west1-ci-input/Diogo/oh_my_school_en.vtt',
+					label: 'English',
+					id: 'en_sub',
+					language: 'en',
+					isDefault: false
+				}
+			]
 		};
 
 		// === Test audio source (public MP3) ===
@@ -97,15 +111,15 @@
 				console.log('Loading new source...');
 				await player.load(source);
 
-				if (type === 'test video') {
-					const subtitle = {
-						url: 'https://storage.googleapis.com/bitmovin-api-europe-west1-ci-input/Diogo/oh_my_school_en.vtt',
-						kind: 'subtitle',
-						label: 'English',
-						lang: 'en'
+				// Add event listener to check if subtitles are available
+				player.on('sourceloaded', () => {
+					console.log('Available subtitles:', player.subtitles.list());
+					if (player.subtitles.list().length > 0) {
+						console.log('Subtitles loaded successfully!');
+					} else {
+						console.log('No subtitles available');
 					}
-                    player.subtitles.add(subtitle);
-				}
+				});
 
 				console.log(`${type} source loaded successfully!`);
 			} catch (error) {
@@ -136,6 +150,41 @@
 					return;
 				}
 				await loadSource(testAudioSource, 'test audio');
+			});
+
+			document.getElementById('checkSubtitles').addEventListener('click', () => {
+				if (!player) {
+					alert('Player not initialized yet');
+					return;
+				}
+				const subtitles = player.subtitles.list();
+				console.log('Available subtitles:', subtitles);
+				alert(`Available subtitles: ${subtitles.length > 0 ? subtitles.map(s => s.label).join(', ') : 'None'}`);
+			});
+
+			document.getElementById('enableSubtitles').addEventListener('click', () => {
+				if (!player) {
+					alert('Player not initialized yet');
+					return;
+				}
+				const subtitles = player.subtitles.list();
+				if (subtitles.length > 0) {
+					player.subtitles.enable(subtitles[0].id);
+					console.log('Enabled subtitle:', subtitles[0].label);
+					alert(`Enabled subtitle: ${subtitles[0].label}`);
+				} else {
+					alert('No subtitles available to enable');
+				}
+			});
+
+			document.getElementById('disableSubtitles').addEventListener('click', () => {
+				if (!player) {
+					alert('Player not initialized yet');
+					return;
+				}
+				player.subtitles.disable();
+				console.log('Subtitles disabled');
+				alert('Subtitles disabled');
 			});
 		});
 	</script>
