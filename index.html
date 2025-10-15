@@ -95,6 +95,8 @@
 				await player.unload();
 
 				console.log('Loading new source...');
+				await player.load(source);
+                
 				if (type === 'test video') {
 					const subtitle = {
 						url: 'https://storage.googleapis.com/bitmovin-api-europe-west1-ci-input/Diogo/oh_my_school_en.vtt',
@@ -102,9 +104,8 @@
 						label: 'English',
 						lang: 'en'
 					}
-					player.subtitles.add(subtitle);
 				}
-				await player.load(source);
+                player.subtitles.add(subtitle);
 
 				console.log(`${type} source loaded successfully!`);
 			} catch (error) {
