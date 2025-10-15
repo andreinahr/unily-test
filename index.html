@@ -1,142 +1,142 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Bitmovin iOS Fullscreen Fix Test</title>
-  <script src="https://cdn.bitmovin.com/player/web/8/bitmovinplayer.js"></script>
-  <style>
-    body {
-      font-family: sans-serif;
-      padding: 20px;
-      background: #fafafa;
-      text-align: center;
-    }
-    #player {
-      width: 100%;
-      max-width: 640px;
-      aspect-ratio: 16/9;
-      margin: 20px auto;
-      background: #000;
-    }
-    button {
-      margin: 10px;
-      padding: 10px 20px;
-      font-size: 14px;
-      cursor: pointer;
-      border-radius: 6px;
-      border: none;
-      background-color: #007bff;
-      color: white;
-    }
-    button:hover {
-      background-color: #0056b3;
-    }
-  </style>
+	<meta charset="UTF-8" />
+	<title>Bitmovin iOS Fullscreen Fix Test</title>
+	<script src="https://cdn.bitmovin.com/player/web/8/bitmovinplayer.js"></script>
+	<style>
+		body {
+			font-family: sans-serif;
+			padding: 20px;
+			background: #fafafa;
+			text-align: center;
+		}
+		#player {
+			width: 100%;
+			max-width: 640px;
+			aspect-ratio: 16/9;
+			margin: 20px auto;
+			background: #000;
+		}
+		button {
+			margin: 10px;
+			padding: 10px 20px;
+			font-size: 14px;
+			cursor: pointer;
+			border-radius: 6px;
+			border: none;
+			background-color: #007bff;
+			color: white;
+		}
+		button:hover {
+			background-color: #0056b3;
+		}
+	</style>
 </head>
 <body>
-  <h2>Bitmovin iOS Fullscreen Fix Test</h2>
-  <div id="player"></div>
-    <button id="loadTest">Load Test Video (Public)</button>
-    <button id="loadTestAudio">Load Test Audio (Public MP3)</button>
-  </div>
+	<h2>Bitmovin iOS Fullscreen Fix Test</h2>
+	<div id="player"></div>
+		<button id="loadTest">Load Test Video (Public)</button>
+		<button id="loadTestAudio">Load Test Audio (Public MP3)</button>
+	</div>
 
-  <script>
-    let player;
+	<script>
+		let player;
 
-    // Initialize player when DOM is ready
-    document.addEventListener('DOMContentLoaded', () => {
-      console.log('DOM loaded, initializing player...');
-      
-      // === Bitmovin player configuration ===
-      const playerConfig = {
-        key: 'ec217a70-d15c-42db-bdfb-70d3d2725063',
-        playback: { autoplay: false },
-      };
+		// Initialize player when DOM is ready
+		document.addEventListener('DOMContentLoaded', () => {
+			console.log('DOM loaded, initializing player...');
 
-      const playerContainer = document.getElementById('player');
-      player = new bitmovin.player.Player(playerContainer, playerConfig);
+			// === Bitmovin player configuration ===
+			const playerConfig = {
+				key: 'ec217a70-d15c-42db-bdfb-70d3d2725063',
+				playback: { autoplay: false },
+			};
 
-      // Add event listeners for debugging
-      player.on('ready', () => {
-        console.log('Player is ready');
-      });
+			const playerContainer = document.getElementById('player');
+			player = new bitmovin.player.Player(playerContainer, playerConfig);
 
-      player.on('error', (event) => {
-        console.error('Player error:', event);
-      });
+			// Add event listeners for debugging
+			player.on('ready', () => {
+				console.log('Player is ready');
+			});
 
-      player.on('sourceloaded', () => {
-        console.log('Source loaded successfully');
-      });
+			player.on('error', (event) => {
+				console.error('Player error:', event);
+			});
 
-      player.on('sourceerror', (event) => {
-        console.error('Source error:', event);
-      });
+			player.on('sourceloaded', () => {
+				console.log('Source loaded successfully');
+			});
 
-      console.log('Player initialized');
-    });
+			player.on('sourceerror', (event) => {
+				console.error('Source error:', event);
+			});
+			console.log('Player instance created:', player);
+			console.log('Player initialized');
+		});
 
-    // === Test source (public, no auth required) ===
-    const testSource = {
-      hls: 'https://cdn.bitmovin.com/content/assets/art-of-motion-dash-hls-progressive/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8',
-      tracks: [
-        {
-          file: 'https://storage.googleapis.com/bitmovin-api-europe-west1-ci-input/Diogo/oh_my_school_en.vtt',
-          kind: 'subtitle',
-          label: 'English',
-          lang: 'en',
-          default: true
-        }
-      ]
-    };
+		// === Test source (public, no auth required) ===
+		const testSource = {
+			hls: 'https://cdn.bitmovin.com/content/assets/art-of-motion-dash-hls-progressive/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8'
+		};
 
-    // === Test audio source (public MP3) ===
-    const testAudioSource = {
-      progressive: 'https://archive.org/download/testmp3testfile/mpthreetest.mp3'
-    };
+		// === Test audio source (public MP3) ===
+		const testAudioSource = {
+			progressive: 'https://archive.org/download/testmp3testfile/mpthreetest.mp3'
+		};
 
-    // === Load sources ===
-    async function loadSource(source, type) {
-      try {
-        console.log(`Starting to load ${type} source:`, source);
-        
-        console.log('Unloading previous source...');
-        await player.unload();
-        
-        console.log('Loading new source...');
-        await player.load(source);
-        
-        console.log(`${type} source loaded successfully!`);
-      } catch (error) {
-        console.error(`Error loading ${type}:`, error);
-        console.error('Error details:', {
-          name: error.name,
-          message: error.message,
-          code: error.code,
-          data: error.data
-        });
-        alert(`Failed to load ${type}: ${error.message || error.code || 'Unknown error'}`);
-      }
-    }
+		// === Load sources ===
+		async function loadSource(source, type) {
+			try {
+				console.log(`Starting to load ${type} source:`, source);
 
-    // === Button handlers ===
-    document.addEventListener('DOMContentLoaded', () => {      
-      document.getElementById('loadTest').addEventListener('click', async () => {
-        if (!player) {
-          alert('Player not initialized yet');
-          return;
-        }
-        await loadSource(testSource, 'test video');
-      });
-      
-      document.getElementById('loadTestAudio').addEventListener('click', async () => {
-        if (!player) {
-          alert('Player not initialized yet');
-          return;
-        }
-        await loadSource(testAudioSource, 'test audio');
-      });
-    });
-  </script>
+				console.log('Unloading previous source...');
+				await player.unload();
+
+				console.log('Loading new source...');
+				if (type === 'test video') {
+					const subtitle = {
+						url: 'https://storage.googleapis.com/bitmovin-api-europe-west1-ci-input/Diogo/oh_my_school_en.vtt',
+						kind: 'subtitle',
+						label: 'English',
+						lang: 'en'
+					}
+					player.subtitles.add(subtitle);
+				}
+				await player.load(source);
+
+				console.log(`${type} source loaded successfully!`);
+			} catch (error) {
+				console.error(`Error loading ${type}:`, error);
+				console.error('Error details:', {
+					name: error.name,
+					message: error.message,
+					code: error.code,
+					data: error.data
+				});
+				alert(`Failed to load ${type}: ${error.message || error.code || 'Unknown error'}`);
+			}
+		}
+
+		// === Button handlers ===
+		document.addEventListener('DOMContentLoaded', () => { 
+			document.getElementById('loadTest').addEventListener('click', async () => {
+				if (!player) {
+					alert('Player not initialized yet');
+					return;
+				}
+				await loadSource(testSource, 'test video');
+			});
+
+			document.getElementById('loadTestAudio').addEventListener('click', async () => {
+				if (!player) {
+					alert('Player not initialized yet');
+					return;
+				}
+				await loadSource(testAudioSource, 'test audio');
+			});
+		});
+	</script>
 </body>
 </html>
