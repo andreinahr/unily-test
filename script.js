@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // === Test source (public, no auth required) ===
 const testSource = {
-    hls: 'https://cdn.bitmovin.com/content/assets/art-of-motion-dash-hls-progressive/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8'
+    hls: 'https://raw.githubusercontent.com/andreinahr/unily-test/refs/heads/main/video/manifest.m3u8',
 };
 
 // === Test audio source (public MP3) ===
