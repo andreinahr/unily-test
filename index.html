@@ -3,74 +3,22 @@
 
 <head>
   <meta charset="UTF-8" />
-  <title>Bitmovin Player - Fullscreen, Subtitles Off</title>
-
-  <!-- Bitmovin Player library -->
+  <title>Bitmovin iOS Fullscreen Fix Test</title>
   <script src="https://cdn.bitmovin.com/player/web/8/bitmovinplayer.js"></script>
-
-  <style>
-    html,
-    body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      background: #000;
-    }
-
-    #player {
-      width: 100%;
-      height: 100vh;
-    }
-  </style>
+  <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
+  <h2>Bitmovin iOS Fullscreen Fix Test</h2>
   <div id="player"></div>
+  <div>
+    <button id="loadTest">Load Test Video (Public)</button>
+    <button id="loadTestAudio">Load Test Audio (Public MP3)</button>
+    <button id="addSubtitlesManually">Add Subtitles Manually</button>
+    <button id="checkSubtitles">Check Available Subtitles</button>
+  </div>
 
-  <script>
-    const config = {
-      key: 'c8783938-0606-4bcf-846d-828906104339',
-      playback: {
-        autoplay: true
-      }
-    };
-
-    const source = {
-      hls: 'https://cdn.bitmovin.com/content/assets/art-of-motion-dash-hls-progressive/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8',
-      title: 'Art of Motion',
-      subtitleTracks: [
-        {
-          url: 'https://storage.googleapis.com/bitmovin-api-europe-west1-ci-input/Diogo/oh_my_school_en.vtt',
-          label: 'English',
-          id: 'en',
-          kind: 'subtitles',
-          lang: 'en',
-          enabled: false // 👈 Subtitles OFF by default
-        }
-      ]
-    };
-
-    const player = new bitmovin.player.Player(document.getElementById('player'), config);
-
-    player.load(source).then(() => {
-      console.log('Video successfully loaded!');
-
-      // Request fullscreen automatically
-      const playerContainer = document.getElementById('player');
-      if (playerContainer.requestFullscreen) {
-        playerContainer.requestFullscreen();
-      } else if (playerContainer.webkitRequestFullscreen) { // Safari
-        playerContainer.webkitRequestFullscreen();
-      } else if (playerContainer.msRequestFullscreen) { // IE/Edge
-        playerContainer.msRequestFullscreen();
-      }
-
-      // Ensure subtitles are off on load
-      player.subtitles.setSubtitleTrack(null);
-    }).catch(error => {
-      console.error('Error loading video:', error);
-    });
-  </script>
+  <script src="script.js"></script>
 </body>
 
 </html>
