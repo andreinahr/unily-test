@@ -57,7 +57,6 @@ const testVideoWithSubtitlesSource = {
     ]
 };
 
-
 // === Load sources ===
 async function loadSource(source, type) {
     try {
@@ -131,64 +130,5 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update button text
         const toggleButton = document.getElementById('togglePlayerUi');
         toggleButton.textContent = playerUiEnabled ? 'Hide UI' : 'Show UI';
-    });
-
-    document.getElementById('addSubtitlesManually').addEventListener('click', async () => {
-        if (!player) {
-            alert('Player not initialized yet');
-            return;
-        }
-        try {
-            console.log('Manual subtitle addition attempt...');
-
-            // Try multiple subtitle URLs and methods
-            const subtitleUrls = [
-                'https://bitdash-a.akamaihd.net/content/sintel/subtitles/subtitles_en.vtt',
-                'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/subtitles_en.vtt',
-                'https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel-en.webvtt'
-            ];
-
-            for (let i = 0; i < subtitleUrls.length; i++) {
-                try {
-                    const subtitleTrack = {
-                        url: subtitleUrls[i],
-                        label: `English ${i + 1}`,
-                        id: `en_sub_${i}`,
-                        language: 'en'
-                    };
-
-                    console.log(`Trying subtitle URL ${i + 1}:`, subtitleUrls[i]);
-
-                    if (player.subtitles && typeof player.subtitles.add === 'function') {
-                        await player.subtitles.add(subtitleTrack);
-                        console.log(`Successfully added subtitle ${i + 1}`);
-                        break;
-                    } else {
-                        console.log('player.subtitles.add is not a function');
-                    }
-                } catch (error) {
-                    console.error(`Failed to add subtitle ${i + 1}:`, error);
-                }
-            }
-
-            // Check results
-            const subtitles = player.subtitles.list();
-            console.log('Subtitles after manual addition:', subtitles);
-            alert(`Manual addition result: ${subtitles.length} subtitles available`);
-
-        } catch (error) {
-            console.error('Manual subtitle addition failed:', error);
-            alert('Manual subtitle addition failed: ' + error.message);
-        }
-    });
-
-    document.getElementById('checkSubtitles').addEventListener('click', () => {
-        if (!player) {
-            alert('Player not initialized yet');
-            return;
-        }
-        const subtitles = player.subtitles.list();
-        console.log('Available subtitles:', subtitles);
-        alert(`Available subtitles: ${subtitles.length > 0 ? subtitles.map(s => s.label).join(', ') : 'None'}`);
     });
 });
