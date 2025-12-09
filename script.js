@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const playerConfig = {
         key: 'c8783938-0606-4bcf-846d-828906104339',
         playback: { autoplay: false },
-        ui: playerUiEnabled
+        ui: playerUiEnabled ? {} : false
     };
 
     const playerContainer = document.getElementById('player');
@@ -121,12 +121,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const newPlayerConfig = {
             key: 'c8783938-0606-4bcf-846d-828906104339',
             playback: { autoplay: false },
-            ui: playerUiEnabled
+            ui: playerUiEnabled ? {} : false
         };
 
         const playerContainer = document.getElementById('player');
         player = new bitmovin.player.Player(playerContainer, newPlayerConfig);
-        
+
         // Update button text
         const toggleButton = document.getElementById('togglePlayerUi');
         toggleButton.textContent = playerUiEnabled ? 'Hide UI' : 'Show UI';
