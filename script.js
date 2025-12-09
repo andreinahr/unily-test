@@ -1,4 +1,5 @@
 let player;
+let playerUiEnabled = true; // Flag para controlar el estado de la UI
 
 // Initialize player when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
@@ -8,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const playerConfig = {
         key: 'c8783938-0606-4bcf-846d-828906104339',
         playback: { autoplay: false },
+        ui: playerUiEnabled
     };
 
     const playerContainer = document.getElementById('player');
@@ -104,6 +106,31 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         await loadSource(testVideoWithSubtitlesSource, 'test video with subtitles');
+    });
+
+    document.getElementById('togglePlayerUi').addEventListener('click', async () => {
+        if (!player) {
+            alert('Player not initialized yet');
+            return;
+        }
+
+        // Toggle the UI flag
+        playerUiEnabled = !playerUiEnabled;
+
+        player.destroy();
+
+        const newPlayerConfig = {
+            key: 'c8783938-0606-4bcf-846d-828906104339',
+            playback: { autoplay: false },
+            ui: playerUiEnabled
+        };
+
+        const playerContainer = document.getElementById('player');
+        player = new bitmovin.player.Player(playerContainer, newPlayerConfig);
+        
+        // Update button text
+        const toggleButton = document.getElementById('togglePlayerUi');
+        toggleButton.textContent = playerUiEnabled ? 'Hide UI' : 'Show UI';
     });
 
     document.getElementById('addSubtitlesManually').addEventListener('click', async () => {
