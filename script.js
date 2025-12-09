@@ -130,5 +130,39 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update button text
         const toggleButton = document.getElementById('togglePlayerUi');
         toggleButton.textContent = playerUiEnabled ? 'Hide UI' : 'Show UI';
+
+        // Show/hide play and pause buttons
+        updatePlaybackControls();
+    });
+
+    // Play button handler
+    document.getElementById('playButton').addEventListener('click', () => {
+        if (player) {
+            player.play();
+        }
+    });
+
+    // Pause button handler
+    document.getElementById('pauseButton').addEventListener('click', () => {
+        if (player) {
+            player.pause();
+        }
     });
 });
+
+// === Update playback controls visibility ===
+function updatePlaybackControls() {
+    const playButton = document.getElementById('playButton');
+    const pauseButton = document.getElementById('pauseButton');
+    
+    if (!playerUiEnabled) {
+        playButton.style.display = 'inline-block';
+        pauseButton.style.display = 'inline-block';
+    } else {
+        playButton.style.display = 'none';
+        pauseButton.style.display = 'none';
+    }
+}
+
+// Initialize playback controls visibility on page load
+window.addEventListener('load', updatePlaybackControls);
