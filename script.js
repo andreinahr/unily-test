@@ -1,34 +1,51 @@
 let player;
-let playerUiEnabled = true; // Flag para controlar el estado de la UI
+let playerWithoutUi = true;
+
+function initPlayer(playerElement, playerConfig) {
+    console.log('initializing player...', playerElement);
+    console.log('player config...', playerConfig);
+
+    const playerContainer = document.getElementById(playerElement);
+    const playerInstance = new bitmovin.player.Player(playerContainer, playerConfig);
+
+    // Add event listeners for debugging
+    playerInstance.on('ready', () => {
+        console.log('Player is ready');
+    });
+
+    playerInstance.on('error', (event) => {
+        console.error('Player error:', event);
+    });
+
+    playerInstance.on('sourceerror', (event) => {
+        console.error('Source error:', event);
+    });
+    console.log('Player instance created:', playerInstance);
+    console.log('Player initialized');
+
+    return playerInstance;
+}
 
 // Initialize player when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM loaded, initializing player...');
+    console.log('DOM loaded...');
 
     // === Bitmovin player configuration ===
     const playerConfig = {
         key: 'c8783938-0606-4bcf-846d-828906104339',
-        playback: { autoplay: false },
-        ui: playerUiEnabled ? {} : false
+        playback: { autoplay: false }
     };
 
-    const playerContainer = document.getElementById('player');
-    player = new bitmovin.player.Player(playerContainer, playerConfig);
+    player = initPlayer('player', playerConfig);
 
-    // Add event listeners for debugging
-    player.on('ready', () => {
-        console.log('Player is ready');
-    });
+    const playerWithoutUiConfig = {
+        key: 'c8783938-0606-4bcf-846d-828906104339',
+        playback: { autoplay: false },
+        ui: false
+    };
 
-    player.on('error', (event) => {
-        console.error('Player error:', event);
-    });
+    playerWithoutUi = initPlayer('playerWithoutUi', playerWithoutUiConfig);
 
-    player.on('sourceerror', (event) => {
-        console.error('Source error:', event);
-    });
-    console.log('Player instance created:', player);
-    console.log('Player initialized');
 });
 
 // === Test source (public, no auth required) ===
@@ -58,15 +75,15 @@ const testVideoWithSubtitlesSource = {
 };
 
 // === Load sources ===
-async function loadSource(source, type) {
+async function loadSource(source, type, playerInstance = player) {
     try {
         console.log(`Starting to load ${type} source:`, source);
 
         console.log('Unloading previous source...');
-        await player.unload();
+        await playerInstance.unload();
 
         console.log('Loading new source...');
-        await player.load(source);
+        await playerInstance.load(source);
 
         console.log(`${type} source loaded successfully!`);
     } catch (error) {
@@ -107,62 +124,41 @@ document.addEventListener('DOMContentLoaded', () => {
         await loadSource(testVideoWithSubtitlesSource, 'test video with subtitles');
     });
 
-    document.getElementById('togglePlayerUi').addEventListener('click', async () => {
-        if (!player) {
-            alert('Player not initialized yet');
+    document.getElementById('loadTestWithoutUi').addEventListener('click', async () => {
+        if (!playerWithoutUi) {
+            alert('Player without UI not initialized yet');
             return;
         }
+        await loadSource(testSource, 'test video', playerWithoutUi);
+    });
 
-        // Toggle the UI flag
-        playerUiEnabled = !playerUiEnabled;
+    document.getElementById('loadTestAudioWithoutUi').addEventListener('click', async () => {
+        if (!playerWithoutUi) {
+            alert('Player without UI not initialized yet');
+            return;
+        }
+        await loadSource(testAudioSource, 'test audio', playerWithoutUi);
+    });
 
-        player.destroy();
-
-        const newPlayerConfig = {
-            key: 'c8783938-0606-4bcf-846d-828906104339',
-            playback: { autoplay: false },
-            ui: playerUiEnabled ? {} : false
-        };
-
-        const playerContainer = document.getElementById('player');
-        player = new bitmovin.player.Player(playerContainer, newPlayerConfig);
-
-        // Update button text
-        const toggleButton = document.getElementById('togglePlayerUi');
-        toggleButton.textContent = playerUiEnabled ? 'Hide UI' : 'Show UI';
-
-        // Show/hide play and pause buttons
-        updatePlaybackControls();
+    document.getElementById('loadVideoWithSubtitlesWithoutUi').addEventListener('click', async () => {
+        if (!playerWithoutUi) {
+            alert('Player without UI not initialized yet');
+            return;
+        }
+        await loadSource(testVideoWithSubtitlesSource, 'test video with subtitles', playerWithoutUi);
     });
 
     // Play button handler
     document.getElementById('playButton').addEventListener('click', () => {
-        if (player) {
-            player.play();
+        if (playerWithoutUi) {
+            playerWithoutUi.play();
         }
     });
 
     // Pause button handler
     document.getElementById('pauseButton').addEventListener('click', () => {
-        if (player) {
-            player.pause();
+        if (playerWithoutUi) {
+            playerWithoutUi.pause();
         }
     });
 });
-
-// === Update playback controls visibility ===
-function updatePlaybackControls() {
-    const playButton = document.getElementById('playButton');
-    const pauseButton = document.getElementById('pauseButton');
-    
-    if (!playerUiEnabled) {
-        playButton.style.display = 'inline-block';
-        pauseButton.style.display = 'inline-block';
-    } else {
-        playButton.style.display = 'none';
-        pauseButton.style.display = 'none';
-    }
-}
-
-// Initialize playback controls visibility on page load
-window.addEventListener('load', updatePlaybackControls);
