@@ -25,6 +25,23 @@ function initPlayer(playerElementId, playerConfig) {
     return playerInstance;
 }
 
+function hideFullscreenButton() {
+    const fullscreenButtons = document.querySelectorAll(".bmpui-ui-fullscreentogglebutton");
+
+    fullscreenButtons.forEach(btn => {
+        btn.style.display = "none";
+    });
+}
+
+function showFullscreenButton() {
+    const fullscreenButtons = document.querySelectorAll(".bmpui-ui-fullscreentogglebutton");
+
+    fullscreenButtons.forEach(btn => {
+        btn.style.display = "block";
+    });
+}
+
+
 // Initialize player when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded...');
@@ -101,6 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         await loadSource(testSource, 'test video');
+        showFullscreenButton();
     });
 
     document.getElementById('loadTestAudio').addEventListener('click', async () => {
@@ -109,6 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         await loadSource(testAudioSource, 'test audio');
+        hideFullscreenButton();
     });
 
     document.getElementById('loadVideoWithSubtitles').addEventListener('click', async () => {
@@ -117,5 +136,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         await loadSource(testVideoWithSubtitlesSource, 'test video with subtitles');
+        showFullscreenButton();
     });
 });
