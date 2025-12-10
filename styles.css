@@ -3,6 +3,7 @@ body {
 	padding: 20px;
 	background: #fafafa;
 	text-align: center;
+	min-height: 800px;
 }
 
 #player {
