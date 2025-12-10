@@ -54,10 +54,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // === Bitmovin player configuration ===
     const playerConfig = {
         key: 'c8783938-0606-4bcf-846d-828906104339',
-        playback: { autoplay: false },
-        ui: {
-            enterFullscreenOnInitialPlayback: true
-        }
+        playback: { autoplay: false }
+        // ui: {
+        //     enterFullscreenOnInitialPlayback: true
+        // }
     };
 
     player = initPlayer('player', playerConfig);
