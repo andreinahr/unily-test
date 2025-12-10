@@ -22,7 +22,7 @@ function initPlayer(playerElementId, playerConfig) {
 
     playerInstance.on('play', () => {
         console.log('Play started - entering fullscreen');
-        playerInstance.setFullscreen(true);
+        playerInstance.setViewMode("fullscreen")
     });
 
     console.log('Player instance created:', playerInstance);
