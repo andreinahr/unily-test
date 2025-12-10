@@ -13,14 +13,6 @@ body {
 	background: #000;
 }
 
-#playerWithoutUi {
-	width: 100%;
-	max-width: 640px;
-	aspect-ratio: 16/9;
-	margin: 20px auto;
-	background: #000;
-}
-
 button {
 	margin: 10px;
 	padding: 10px 20px;
