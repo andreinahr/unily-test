@@ -22,7 +22,6 @@ function initPlayer(playerElementId, playerConfig) {
 
     playerInstance.on('play', () => {
         console.log('Play started - entering fullscreen');
-        playerInstance.setViewMode("fullscreen")
     });
 
     console.log('Player instance created:', playerInstance);
@@ -55,7 +54,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // === Bitmovin player configuration ===
     const playerConfig = {
         key: 'c8783938-0606-4bcf-846d-828906104339',
-        playback: { autoplay: false }
+        playback: { autoplay: false },
+        ui: {
+            enterFullscreenOnInitialPlayback: true
+        }
     };
 
     player = initPlayer('player', playerConfig);
