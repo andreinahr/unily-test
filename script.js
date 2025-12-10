@@ -19,6 +19,12 @@ function initPlayer(playerElementId, playerConfig) {
     playerInstance.on('sourceerror', (event) => {
         console.error('Source error:', event);
     });
+
+    playerInstance.on('play', () => {
+        console.log('Play started - entering fullscreen');
+        playerInstance.setFullscreen(true);
+    });
+
     console.log('Player instance created:', playerInstance);
     console.log('Player initialized');
 
@@ -49,12 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // === Bitmovin player configuration ===
     const playerConfig = {
         key: 'c8783938-0606-4bcf-846d-828906104339',
-        playback: { autoplay: false },
-        ui: {
-            controls: {
-                fullscreenButton: false
-            }
-        }
+        playback: { autoplay: false }
     };
 
     player = initPlayer('player', playerConfig);
