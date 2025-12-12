@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         await loadSource(testSource, 'test video');
-        showFullscreenButton();
+        // showFullscreenButton();
     });
 
     document.getElementById('loadTestAudio').addEventListener('click', async () => {
@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         await loadSource(testAudioSource, 'test audio');
-        hideFullscreenButton();
+        // hideFullscreenButton();
     });
 
     document.getElementById('loadVideoWithSubtitles').addEventListener('click', async () => {
@@ -139,6 +139,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         await loadSource(testVideoWithSubtitlesSource, 'test video with subtitles');
-        showFullscreenButton();
+        // showFullscreenButton();
     });
 });
